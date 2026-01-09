@@ -1,203 +1,211 @@
-
-    const user1=document.getElementById("user1");
-    const user2=document.getElementById("user2");
-    const title=document.getElementById("first");
-    const des=document.getElementById("second");
-    
-    const btn=document.getElementById("btn1");
-    const msg=document.getElementById("msg");
-    const todolist=document.getElementById("space");
-
-    const btn2=document.getElementById("btn2");
-    const btn3=document.getElementById("btn3");
-
-    const loginsection=document.getElementById("user");
-    const todosection=document.getElementById("todo");
-
-
-    const API="http://localhost:3000";
-
-   /* login --------------*/
-
-        btn.addEventListener('click',async()=>{
-            const username=user1.value;
-            const password=user2.value;
-        
+const signupBtn = document.getElementById("btnSignup");
+const toggleAuth = document.getElementById("toggleAuth");
+const authTitle = document.getElementById("authTitle");
 
 
 
-    try{
-        
-        const res=await fetch(`${API}/signin`,{
-        method:"POST",
-        body:JSON.stringify({
-            username,
-            password
-        }),
-        headers:{
+const user1 = document.getElementById("user1");
+const user2 = document.getElementById("user2");
+const titleInput = document.getElementById("first");
+const descInput = document.getElementById("second");
 
-          "Content-Type":  "application/json"}
+const loginBtn = document.getElementById("btn1");
+const logoutBtn = document.getElementById("btn2");
+const addTodoBtn = document.getElementById("btn3");
 
-        });
-        const data=await res.json();
+const msg = document.getElementById("msg");
+const todoList = document.getElementById("space");
 
-        if(res.ok){
-            localStorage.setItem("token",data.token);
-            msg.textContent="login successfull";
-            loginsection.style.display="none";
-            todosection.style.display="block";
-        }else{
-            msg.textContent=data.msg;
-        }
+const loginSection = document.getElementById("user");
+const todoSection = document.getElementById("todo");
+
+const API = "http://localhost:3000";
 
 
-        
+let isSignup = false;
 
-    }catch(err){
-        console.err("Login error",err);
-        msg.textContent="An error occur during login"
+toggleAuth.addEventListener("click", () => {
+  isSignup = !isSignup;
 
-    }
-     
+  if (isSignup) {
+    authTitle.innerText = "Signup";
+    signupBtn.style.display = "inline-block";
+    loginBtn.style.display = "none";
+    toggleAuth.innerText = "Login";
+  } else {
+    authTitle.innerText = "Login";
+    signupBtn.style.display = "none";
+    loginBtn.style.display = "inline-block";
+    toggleAuth.innerText = "Signup";
+  }
 
+  msg.textContent = "";
 });
-    
+signupBtn.addEventListener("click", async () => {
+  const username = user1.value;
+  const password = user2.value;
+
+  if (!username || !password) {
+    msg.textContent = "Username and password are required";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    msg.textContent = data.msg;
+
+    if (res.ok) {
+      // After successful signup → go to login
+      isSignup = false;
+      authTitle.innerText = "Login";
+      signupBtn.style.display = "none";
+      loginBtn.style.display = "inline-block";
+      toggleAuth.innerText = "Signup";
+    }
+
+  } catch (err) {
+    msg.textContent = "Signup failed";
+  }
+});
+
+
+/* ---------- LOGIN ---------- */
+loginBtn.addEventListener("click", async () => {
+  const username = user1.value;
+  const password = user2.value;
+
+  try {
+    const res = await fetch(`${API}/signin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      msg.textContent = "Login successful";
+      loginSection.style.display = "none";
+      todoSection.style.display = "block";
+      loadTodos();
+    } else {
+      msg.textContent = data.msg;
+    }
+  } catch (err) {
+    msg.textContent = "Login error";
+  }
+});
 
 /* ---------- LOGOUT ---------- */
-btn2.addEventListener("click", () => {
+logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("token");
-  todosection.style.display = "none";
-  loginsection.style.display = "block";
-  todolist.innerHTML = "";
+  todoSection.style.display = "none";
+  loginSection.style.display = "block";
+  todoList.innerHTML = "";
 });
 
+/* ---------- LOAD TODOS ---------- */
+async function loadTodos() {
+  const token = localStorage.getItem("token");
 
-    const token=localStorage.getItem("token");
-
-    try{
-        const res=await fetch(`${API}/todos`,{
-            method:"GET",
-            headers:{
-                "Authorization":`Bearer ${token}`
-
-            }
-            
-        })
-        const data=await res.json();
-        if(res.ok){
-            data.todos.forEach((todo)=>{
-                const li=document.createElement("li");
-                li.textContent=`${todo.title}:${todo.description}`;
-                todolist.appendChild(li);
-
-                 
-
-            });
-        }else{
-            todolist.textContent=data.msg;
-
-        }
-        }
-        catch(err){
-            console.err("Fetch todos error",err);
-            todolist.textContent="An error occurred while fetching todos";
-        }
-    
- async function createtodo(){
-
- btn3.addEventListener('click',async()=>{
-   const title=title;
-    const description=des;
-    const token=localStorage.getItem("token");
-    try{
-      const res= await fetch(`${API}/todos`,{
-            method:"POST",
-            body:JSON.stringify({
-                title,
-                description
-
-            }),
-            headers:{
-                "Authorization":`Bearer ${token}`,
-                "Content-Type":"application/json",
-
-            }
-
-        })
-        const data=await res.json();
-        if(res.ok){
-            const li=document.createElement("li");
-            li.textContent=`${data.todo.title}:${data.todo.description}`;
-            todolist.appendChild(li);
-
-        }
-        else{
-        todolist.textContent=data.msg;
-
+  const res = await fetch(`${API}/todos`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
     }
+  });
 
-    }catch(err){
-        console.err("Create todo error",err);
-        todolist.textContent="An error occurred while creating todo";
- }
+  const data = await res.json();
+  todoList.innerHTML = "";
+
+  data.todos.forEach(todo => {
+    const div = document.createElement("div");
+    div.className = "todo-item";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = todo.completed;
+
+    checkbox.addEventListener("change", () =>
+      updateTodo(todo._id, checkbox.checked)
+    );
+
+    const span = document.createElement("span");
+    span.textContent = todo.title;
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "❌";
+    delBtn.onclick = () => deleteTodo(todo._id);
+
+    div.appendChild(checkbox);
+    div.appendChild(span);
+    div.appendChild(delBtn);
+
+    todoList.appendChild(div);
+  });
+}
+
+/* ---------- CREATE TODO ---------- */
+addTodoBtn.addEventListener("click", async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API}/todos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      title: titleInput.value,
+      description: descInput.value
+    })
+  });
+
+  titleInput.value = "";
+  descInput.value = "";
+  loadTodos();
 });
- }
- createtodo();
 
+/* ---------- UPDATE TODO ---------- */
+async function updateTodo(id, completed) {
+  const token = localStorage.getItem("token");
 
-async function updatetodo() {
-    const token=localStorage.getItem("token");
-    try{
-        const res=await fetch(`${API}/todo/:todoId`,{
-            method:"PUT",
-            headers:{
-                "Authorization":`Bearer ${token}`,
-                "Content-Type":"application/json"
-
-            }
-        })
-        const data=await res.json();
-        if(res.ok){
-            console.log("Todo updated:",data.todo);
-
-        }else{
-            console.log("Error updating todo:",data.msg);
-
-        }
-    }catch(err){
-        console.err("while updated error",err);
-        data.textContent="Error while updated todo";
-    }
-    
+  await fetch(`${API}/todo/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify({ completed })
+  });
 }
-updatetodo();
 
-async function deletetodo(){
-    const token=localStorage.getItem("token");
-    try{
-        const res=await fetch(`${API}/todo/:todoId`,{
-            method:"DELETE",
-            headers:{
-                "Authorization":`Bearer ${token}`
-            }
+/* ---------- DELETE TODO ---------- */
+async function deleteTodo(id) {
+  const token = localStorage.getItem("token");
 
-
-            
-        })
-        const data=await res.json();
-        if(res.ok){
-            localStorage.clear("token");
-            msg.textContent="Deleted successfull";
-        }else{
-            msg.textContent=data.msg;
-        }
-    }catch(err){
-        console.err("delete todo error",err);
-        msg.textContent="Error while updated"
+  await fetch(`${API}/todo/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`
     }
+  });
+
+  loadTodos();
 }
-deletetodo();
 
+if (localStorage.getItem("token")) {
+  loginSection.style.display = "none";
+  todoSection.style.display = "block";
+  loadTodos();
+}
 
-
-    
