@@ -1,0 +1,130 @@
+/* ===== Global Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== Body ===== */
+body {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #0f2027, #000000);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #e0e0e0;
+}
+
+/* ===== Containers ===== */
+#user,
+#todo {
+  width: 380px;
+  margin: 60px auto;
+  padding: 25px;
+  background: rgba(15, 15, 15, 0.95);
+  border-radius: 12px;
+  border: 1px solid #0ff;
+  box-shadow:
+    0 0 10px #0ff,
+    0 0 30px rgba(0, 255, 255, 0.2);
+}
+
+/* Hide todo initially */
+#todo {
+  display: none;
+}
+
+/* ===== Inputs ===== */
+input {
+  width: 100%;
+  padding: 12px;
+  background: #050505;
+  border: 1px solid #00ffff;
+  border-radius: 6px;
+  color: #00ffff;
+  font-size: 14px;
+  outline: none;
+  box-shadow: inset 0 0 8px rgba(0, 255, 255, 0.2);
+}
+
+input::placeholder {
+  color: #777;
+}
+
+input:focus {
+  box-shadow:
+    0 0 8px #00ffff,
+    inset 0 0 8px #00ffff;
+}
+
+/* ===== Buttons ===== */
+button {
+  padding: 10px 16px;
+  margin-right: 8px;
+  background: linear-gradient(135deg, #00ffff, #0066ff);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+button:hover {
+  background: linear-gradient(135deg, #0066ff, #00ffff);
+  box-shadow:
+    0 0 20px #00ffff,
+    0 0 40px rgba(0, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+#btn2 {
+  background: linear-gradient(135deg, #ff004c, #ff0000);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+#btn2:hover {
+  box-shadow:
+    0 0 20px #ff004c,
+    0 0 40px rgba(255, 0, 0, 0.7);
+}
+
+/* ===== Message ===== */
+#msg {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #ff004c;
+}
+
+/* ===== Todo List Area ===== */
+#space {
+  margin-top: 15px;
+}
+
+/* Each todo item (you'll create via JS) */
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: #020202;
+  border-left: 4px solid #00ffff;
+  border-radius: 6px;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.todo-item.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+  border-left-color: #00ff00;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 420px) {
+  #user,
+  #todo {
+    width: 90%;
+  }
+}
